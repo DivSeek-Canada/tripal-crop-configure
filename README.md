@@ -1,2 +1,3 @@
-# tripal-crop-configure
-Provides commands to configure sites provisioned via the Tripal Crop Docker.
+# Tripal Crop Configure
+
+Provides drush commands to configure Tripal sites focused on crop and breeding research.
