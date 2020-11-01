@@ -1,0 +1,5 @@
+name = Tripal Crop Configure
+description = Provides drush commands to configure Tripal sites focused on crop and breeding research.
+core = 7.x
+package = DivSeek Canada
+dependencies[] = tripal
