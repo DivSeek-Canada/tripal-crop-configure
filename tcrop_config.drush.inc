@@ -1,5 +1,7 @@
 <?php
 
+include_once('display_settings/tcrop_config.display_settings.api.inc');
+
 /**
  * Implements hook_drush_command().
  */
@@ -35,6 +37,21 @@ function tcrop_config_drush_command() {
 		'callback' => 'drush_add_tcrop_species',
     'examples' => array(
        'drush tcrop-species Lens culinaris Lentil "L. culinaris"' => 'Adds Lentil to the resource configuration.',
+     ),
+  );
+
+  $commands['reset-tcrop-display'] = array(
+    'description' => 'Resets the display for all Tripal Content Types.',
+    'aliases' => array('tcrop-display'),
+		'arguments' => array(
+			'genus' => '',
+			'species' => '',
+			'common_name' => '',
+			'abbreviation' => '',
+		),
+		'callback' => 'drush_reset_tcrop_display',
+    'examples' => array(
+       'drush tcrop-display' => 'Resets the display for all Tripal Content Types.',
      ),
   );
 
@@ -172,4 +189,28 @@ function drush_add_tcrop_species($genus, $species, $common_name, $abbreviation) 
 		variable_set($varname, $value);
 	}
 
+}
+
+/**
+ * Resets the display for all Tripal Content Types.
+ */
+function drush_reset_tcrop_display() {
+  $mview_name = 'db2cv_mview';
+  $mview_id = chado_get_mview_id($mview_name);
+
+  $bundles = tripal_get_content_types();
+  foreach ($bundles as $bundle_details) {
+    $bundle_name = $bundle_details->name;
+
+    // Load the bundle/term.
+    $bundle = tripal_load_bundle_entity(array('name' => $bundle_name));
+    $term = tripal_load_term_entity(array('term_id' => $bundle->term_id));
+
+    // Reset the mview.
+    chado_populate_mview($mview_id);
+
+    // Refresh the fields on the bundle. This ensures all fields are present.
+    $added = tripal_create_bundle_fields($bundle, $term);
+    tcrop_config_display_reset_ds_display($bundle_name);
+  }
 }

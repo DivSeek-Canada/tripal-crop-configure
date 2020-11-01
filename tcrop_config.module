@@ -30,3 +30,89 @@ function tcrop_configure_get_modules($include_prereqs = FALSE) {
 		return $modules;
 	}
 }
+
+/**
+ * Returns the Tripal Pane categories for Germplasm Tripal Content Types.
+ */
+function tcrop_config_get_field_categories_germplasm() {
+	$categories = [];
+
+	$categories['hidden'] = [
+		'name' => 'Hidden',
+		'display' => 'disabled',
+		'fields' => [
+			'rdfs__type',
+			'local__is_obsolete',
+		],
+	];
+
+	$categories['names'] = [
+		'name' => 'Accessions',
+		'display' => 'right',
+		'fields' => [
+			'obi__organism',
+			'schema__name',
+			'data__identifier',
+			'data__accession',
+		],
+	];
+
+	$categories['passport'] = [
+		'name' => 'Passport Data',
+		'display' => 'right',
+		'fields' => [
+			'schema__description',
+			'sio__annotation',
+			'sbo__database_cross_reference',
+		],
+	];
+
+	$categories['phenotype_summary'] = [
+		'name' => 'Phenotypic Data Summary',
+		'display' => 'right',
+		'fields' => [
+			'local__number_of_traits',
+			'local__number_of_experiments',
+			'local__number_of_locations',
+			'local__number_of_years',
+		],
+	];
+
+	$categories['phenotypes'] = [
+		'name' => 'Phenotypic Data',
+		'display' => 'right',
+		'fields' => [
+			'local__magnitude_of_phenotypes',
+			'hp__phenotypic_variability',
+			'local__child_studies',
+
+		],
+	];
+
+	$categories['genotypes'] = [
+		'name' => 'Genotypic Data',
+		'display' => 'right',
+		'fields' => [
+			'local__stock_quick_filter',
+			'local__germ_marker_summary',
+		],
+	];
+
+	$categories['relationships'] = [
+		'name' => 'Related Germplasm',
+		'display' => 'right',
+		'fields' => [
+			'sbo__relationship',
+		],
+	];
+
+	$categories['publications'] = [
+		'name' => 'Associated Publications',
+		'display' => 'right',
+		'fields' => [
+			'schema__publication',
+		],
+	];
+
+	return $categories;
+}
