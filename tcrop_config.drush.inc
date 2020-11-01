@@ -23,6 +23,21 @@ function tcrop_config_drush_command() {
      ),
   );
 
+	$commands['add-tcrop-species'] = array(
+    'description' => 'Adds the specified species and configures the resource for it.',
+    'aliases' => array('tcrop-species'),
+		'arguments' => array(
+			'genus' => '',
+			'species' => '',
+			'common_name' => '',
+			'abbreviation' => '',
+		),
+		'callback' => 'drush_add_tcrop_species',
+    'examples' => array(
+       'drush tcrop-species Lens culinaris Lentil "L. culinaris"' => 'Adds Lentil to the resource configuration.',
+     ),
+  );
+
   return $commands;
 }
 
@@ -45,9 +60,15 @@ function drush_enable_tcrop_modules() {
  */
 function drush_reset_tcrop_config () {
 
-	// chado_custom_search
-	//------------------------------------
-	// No configuration needed.
+	// Modules which don't need configuration:
+	//  - chado_custom_search
+	//  - trpdownload_api
+	//  - divseek_search
+	//  - tripal_qtl
+	//  - vcf_filter: Configuration is per VCF file added.
+	//  - tripal_germplasm_importer
+	//  - tripal_map
+
 
 	// trpfancy_fields
 	//------------------------------------
@@ -60,10 +81,6 @@ function drush_reset_tcrop_config () {
 	variable_get('tripald3_colorScheme', 'NvGr');
 	variable_set('tripald3_stock_pedigree_rels',
 		'a:2:{s:6:"object";a:2:{i:3632;s:21:"is_maternal_parent_of";i:3633;s:21:"is_paternal_parent_of";}s:7:"subject";a:5:{i:3712;s:17:"is_extracted_from";i:3678;s:27:"is_individual_of_population";i:3634;s:24:"is_progeny_of_selfing_of";i:3679;s:25:"is_registered_cultivar_of";i:3684;s:15:"is_selection_of";}}');
-
-	// trpdownload_api
-	//------------------------------------
-	// No configuration needed.
 
 	// analyzedphenotypes
 	//------------------------------------
@@ -82,10 +99,6 @@ function drush_reset_tcrop_config () {
 	// Update mview to include default cvterms.
 	ap_update_mview_phenotypesummary();
 	// Rest of the configuration is per crop.
-
-	// divseek_search
-	//------------------------------------
-	// No configuration needed.
 
 	// nd_genotypes
 	//------------------------------------
@@ -107,20 +120,56 @@ function drush_reset_tcrop_config () {
 	//------------------------------------
 	// @todo configure once JBrowse is available.
 
-	// tripal_qtl
-	//------------------------------------
-	// No configuration needed.
+}
 
-	// vcf_filter
-	//------------------------------------
-	// Configuration is per VCF file added.
+/**
+ * Adds the specified species and configures the resource for it.
+ */
+function drush_add_tcrop_species($genus, $species, $common_name, $abbreviation) {
 
-	// tripal_germplasm_importer
-	//------------------------------------
-	// No configuration needed.
+	// Create the organism record.
+	$organism = [
+		'genus' => $genus,
+		'species' => $species,
+		'common_name' => $common_name,
+		'abbreviation' => $abbreviation
+	];
+	chado_insert_record('organism', $organism);
 
-	// tripal_map
-	//------------------------------------
-	// No configuration needed.
+	// Configure Analyzed Phenotypes
+	// -- Create cvs and db.
+	$trait_cv = 'Phenotypic Data: ' . $genus . ' Traits';
+	$trait_cvobj = chado_insert_cv(
+		$trait_cv,
+		'A collection of breeder-specified traits for ' . $genus
+	);
+	$method_cv = 'Phenotypic Data: ' . $genus . ' Methods';
+	$method_cvobj = chado_insert_cv(
+		$method_cv,
+		'A collection of breeder-specified methods for ' . $genus
+	);
+	$unit_cv = 'Phenotypic Data: ' . $genus . ' Units';
+	$unit_cvobj = chado_insert_cv(
+		$unit_cv,
+		'A collection of breeder-specified units for ' . $genus
+	);
+	$db = 'Phenotypic Data: ' . $genus . ' References';
+	$trait_dbobj = chado_insert_db([
+		'name' => $db,
+		'description' => "Contains database references for $genus phenotypic data."
+	]);
+
+	// -- Add configuration.
+	$basename = 'analyzedphenotypes_systemvar_';
+	$sanitized_genus = strtolower(preg_replace('/\s+/', '_', $genus));
+	$vars = [
+		$basename . $sanitized_genus . '_cv' => $trait_cvobj->cv_id,
+		$basename . $sanitized_genus . '_method' => $method_cvobj->cv_id,
+		$basename . $sanitized_genus . '_unit' => $unit_cvobj->cv_id,
+		$basename . $sanitized_genus . '_db' => $trait_dbobj->db_id,
+	];
+	foreach ($vars as $varname => $value) {
+		variable_set($varname, $value);
+	}
 
 }
