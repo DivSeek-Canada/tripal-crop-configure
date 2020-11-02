@@ -50,3 +50,18 @@ drush tcrop-display
 		tripal_qtl, vcf_filter, tripal_germplasm_importer, tripal_map
 
 It is recommended to use this module with [Tripal Crop Docker](https://www.divseekcanada.ca/tripal-crop-docker/) which already contains all the above modules!
+
+## Future Work
+
+ - More automatic display configuration for even more intuitive pages for breeders.
+ - Automatic configuration of permissions.
+ - Integration with JBrowse and Galaxy.
+ - Automatic data submission to multiple modules (e.g. an VCF file could be added to VCF Filter, Tripal JBrowse, Tripal Galaxy and ND Genotypes)
+ 
+ ## Funding
+
+The first iteration of the platform is funded under a [Genome Canada Project](https://www.genomecanada.ca/en/divseek-canada-harnessing-genomics-accelerate-crop-improvement-canada) with co-funding from other partners.
+
+## Citation
+
+Lacey-Anne Sanderson, Kirstin E. Bett, Loren H. Rieseberg (2020) Tripal Crop Config: drush commands to configure Tripal sites focused on crop and breeding research. DEVELOPMENT VERSION. DivSeek Canada Pilot Project: Harnessing Genomics to Accelerate Crop Improvement in Canada.
